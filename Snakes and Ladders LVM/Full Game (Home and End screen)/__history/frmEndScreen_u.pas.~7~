@@ -1,0 +1,62 @@
+unit frmEndScreen_u;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, ExtCtrls, StdCtrls, frmSnakesAndLaddersLVM_u;
+
+type
+  TfrmEndScreen = class(TForm)
+    imgWin: TImage;
+    tmrWin: TTimer;
+    lblWin: TLabel;
+    procedure tmrWinTimer(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmEndScreen: TfrmEndScreen;
+
+implementation
+
+{$R *.dfm}
+
+procedure TfrmEndScreen.FormActivate(Sender: TObject);
+begin
+  if frmSnakesAndLadders.iWin = 1
+  then lblWin.Caption := 'Congratulations '+ ', you have won ' + #13 + 'the game in ' + #13  + IntToStr(frmSnakesAndLadders.iCount) + ' moves!'
+    else if frmSnakesAndLadders.iWin = 2
+          then lblWin.Caption :=  'Congratulations ' + #13 + frmSnakesAndLadders.sName1 +  #13 + ' you have won the game!'
+          else if frmSnakesAndLadders.iWin = 3
+              then lblWin.Caption :=  'Congratulations ' + #13 + frmSnakesAndLadders.sName2 + #13 + ' you have won the game!';
+
+
+end;
+
+procedure TfrmEndScreen.tmrWinTimer(Sender: TObject);
+  var
+  iNum : Integer;
+begin
+  iNum := 1;
+
+  if iNum = 1
+  then
+  begin
+    iNum := 2;
+    imgWin.Picture.LoadFromFile('Win1.jpg');
+  end
+    else if iNum = 2
+        then
+        begin
+          iNum := 1;
+          imgWin.Picture.LoadFromFile('Win2.jpg');
+        end;
+
+end;
+
+end.

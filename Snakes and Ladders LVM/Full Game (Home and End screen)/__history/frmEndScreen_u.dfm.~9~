@@ -1,0 +1,68 @@
+object frmEndScreen: TfrmEndScreen
+  Left = 0
+  Top = 0
+  Caption = 'You'#39've Won!'
+  ClientHeight = 749
+  ClientWidth = 1370
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  WindowState = wsMaximized
+  OnActivate = FormActivate
+  PixelsPerInch = 96
+  TextHeight = 13
+  object imgWin: TImage
+    Left = 8
+    Top = -34
+    Width = 1386
+    Height = 788
+    Stretch = True
+  end
+  object lblWin: TLabel
+    Left = 184
+    Top = 121
+    Width = 793
+    Height = 385
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -48
+    Font.Name = 'Ravie'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object bbmClose: TBitBtn
+    Left = 1249
+    Top = 672
+    Width = 113
+    Height = 61
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -19
+    Font.Name = 'Ravie'
+    Font.Style = []
+    Kind = bkClose
+    ParentFont = False
+    TabOrder = 0
+    OnClick = bbmCloseClick
+  end
+  object bmbReset: TBitBtn
+    Left = 504
+    Top = 520
+    Width = 169
+    Height = 81
+    Caption = '&Replay'
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -19
+    Font.Name = 'Ravie'
+    Font.Style = [fsBold]
+    Kind = bkRetry
+    ParentFont = False
+    TabOrder = 1
+    OnClick = bmbResetClick
+  end
+end

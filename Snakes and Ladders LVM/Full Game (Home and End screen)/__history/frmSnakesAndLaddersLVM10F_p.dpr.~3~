@@ -1,0 +1,16 @@
+program frmSnakesAndLaddersLVM10F_p;
+
+uses
+  Forms,
+  frmSnakesAndLaddersLVM10F_u in 'frmSnakesAndLaddersLVM10F_u.pas' {frmHomeScreen},
+  frmSnakesAndLaddersLVM_u in '..\Extra File (not to be opened)\frmSnakesAndLaddersLVM_u.pas' {frmSnakesAndLadders};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TfrmHomeScreen, frmHomeScreen);
+  Application.CreateForm(TfrmSnakesAndLadders, frmSnakesAndLadders);
+  Application.Run;
+end.

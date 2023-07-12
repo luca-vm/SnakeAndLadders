@@ -1,0 +1,849 @@
+unit frmSnakesAndLaddersLVM_u;   //Coded by Luca von Mayer 10F
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, ExtCtrls, jpeg, Math, Buttons;
+
+type
+  TfrmSnakesAndLadders = class(TForm)
+    imgBoard: TImage;
+    shpToken: TShape;
+    btnDown: TButton;
+    btnUp: TButton;
+    btnLeft: TButton;
+    btnRight: TButton;
+    btnMys1: TButton;
+    btnMys2: TButton;
+    btnMys3: TButton;
+    btnMulti1: TButton;
+    btnMuti2: TButton;
+    btnMuti3: TButton;
+    btnMuti4: TButton;
+    btnRollDice: TButton;
+    edtDice: TEdit;
+    btnDone: TButton;
+    lblMovesCounter: TLabel;
+    imgDice: TImage;
+    shpToken2: TShape;
+    imgBackground: TImage;
+    btnMys4: TButton;
+    lblPlayer1Tracker: TLabel;
+    lblPlayer2Tracker: TLabel;
+    lbl2xDisclaimer: TLabel;
+    bmbClose: TBitBtn;
+    lblImpossibleMys: TLabel;
+    tmrImpossibleMys: TTimer;
+    pnlRules: TPanel;
+    bmbClosePanel: TBitBtn;
+    memRules: TMemo;
+    btnRules: TButton;
+    procedure btnRightClick(Sender: TObject);
+    procedure btnUpClick(Sender: TObject);
+    procedure btnLeftClick(Sender: TObject);
+    procedure btnDownClick(Sender: TObject);
+    procedure btnRollDiceClick(Sender: TObject);
+    procedure btnDoneClick(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
+    procedure tmrImpossibleMysTimer(Sender: TObject);
+    procedure lblImpossibleMysClick(Sender: TObject);
+    procedure btnRulesClick(Sender: TObject);
+    procedure bmbClosePanelClick(Sender: TObject);
+  private
+ iNum, iDice1, iDice2, iDice3, iTop, iTop2, iLeft, iLeft2, iCount2xPlayer1, iCount2xPlayer2, iNumPlayers, iTurn: Integer;
+
+  public
+  iWin, iCount : Integer;                     //Placed here to be used in other forms
+  sName1, sName2 : string;
+  end;
+
+var
+  frmSnakesAndLadders: TfrmSnakesAndLadders;
+
+implementation
+
+uses frmEndScreen_u;
+
+{$R *.dfm}
+
+procedure TfrmSnakesAndLadders.bmbClosePanelClick(Sender: TObject);
+begin
+  pnlRules.Visible := False;               //Closes rules page
+end;
+
+procedure TfrmSnakesAndLadders.btnDoneClick(Sender: TObject);
+begin
+  //Single player
+  if (iNumPlayers = 1)
+  then
+  begin
+
+    //2x Multiplier block
+    If (shpToken.Left = 1117) AND (shpToken.Top = 513) OR
+     (shpToken.Left = 1117) AND (shpToken.Top = 393) OR
+     (shpToken.Left = 795) AND (shpToken.Top = 393) OR
+     (shpToken.Left = 312) AND (shpToken.Top = 273)
+      then
+      begin
+       Inc(iCount2xPlayer1);
+       ShowMessage('Your next move will be doubled!');
+
+      end;
+
+
+    //Mystery Box
+    If(shpToken.Left = 473) AND (shpToken.Top = 513) OR
+      (shpToken.Left = 312) AND (shpToken.Top = 153) OR
+      (shpToken.Left = 312) AND (shpToken.Top = 33) OR
+      (shpToken.Left = 795) AND (shpToken.Top = 33)
+
+      then
+        begin
+         Dec(iTurn);
+         Dec(iCount);
+         lblImpossibleMys.Visible := True;
+
+         iNum := RandomRange(1,10);
+          case iNum of
+
+            1:   ShowMessage('Move 3 blocks forward');
+            2:   ShowMessage('Move back 3 blocks');
+            3:   ShowMessage('Move up 1 block');
+            4:   ShowMessage('Move down 1 block ');
+            5:   ShowMessage('Go to the nearest 2x Multiplier block');
+            6:   ShowMessage('Go to the nearest ladder');
+            7:   ShowMessage('Go to the nearest snake');
+            8:   ShowMessage('Move 1 block up and 2 blocks right');
+            9:   ShowMessage('Move 2 blocks left');
+            10:  ShowMessage('Move up 5 blocks');
+
+          end
+        end
+        else lblImpossibleMys.Visible := False;
+
+
+    //Snakes
+    //Snake 1:
+    If (shpToken.Left = 956) AND (shpToken.Top = 273)
+    then
+      Begin
+        ShowMessage('Oh no, you have been eaten by a snake!');
+        shpToken.Left := 795;
+        shpToken.Top := 513;
+      end;
+
+    //Snake 2:
+    If (shpToken.Left = 1117) AND (shpToken.Top = 153)
+     then
+      Begin
+        ShowMessage('Oh no, you have been eaten by a snake!');
+        shpToken.Left := 1117;
+        shpToken.Top := 393;
+       end;
+
+    //Snake 3:
+    If (shpToken.Left = 795) AND (shpToken.Top = 153)
+      then
+      Begin
+        ShowMessage('Oh no, you have been eaten by a snake!');
+        shpToken.Left := 795;
+        shpToken.Top := 393;
+      end;
+
+    //Snake 4:
+   If (shpToken.Left = 634) AND (shpToken.Top = 33)
+     then
+      Begin
+        ShowMessage('Oh no, you have been eaten by a snake!');
+        shpToken.Left := 312;
+        shpToken.Top := 513;
+      end;
+
+    //Ladders
+    //Ladder 1:
+    If (shpToken.Left = 634) AND (shpToken.Top = 513)
+    then
+    Begin
+    ShowMessage('Yay, you have found a ladder!');
+    shpToken.Left := 634;
+    shpToken.Top := 153;
+   end;
+
+    //Ladder 2:
+    If (shpToken.Left = 956) AND (shpToken.Top = 513)
+    then
+    Begin
+    ShowMessage('Yay, you have found a ladder!');
+    shpToken.Left := 956;
+    shpToken.Top := 393;
+    end;
+
+    //Ladder 3:
+    If (shpToken.Left = 473) AND (shpToken.Top = 393)
+    then
+    Begin
+    ShowMessage('Yay, you have found a ladder!');
+    shpToken.Left := 473;
+    shpToken.Top := 33;
+    end;
+
+    //Ladder 4:
+    If (shpToken.Left = 956) AND (shpToken.Top = 153)
+    then
+    Begin
+    ShowMessage('Yay, you have found a ladder!');
+    shpToken.Left := 956;
+    shpToken.Top := 33;
+    end;
+
+    //Moves Counter
+    Inc(iCount);
+    lblMovesCounter.Caption := 'Total moves this game: ' + IntToStr(iCount);
+
+     if (shpToken.Left = 1117) AND (shpToken.Top = 33)
+    then
+    begin
+      Sleep(2500);
+      iWin := 1;
+      frmEndScreen.Show;
+      frmSnakesAndLadders.Hide;
+    end;
+
+  end;
+
+  //2 Players
+  //For Player 1
+  if (iNumPlayers = 2) and (iTurn MOD 2 =  0)
+  then
+  begin
+
+
+    //2x Multiplier block
+    If (shpToken.Left = 1117) AND (shpToken.Top = 513) OR
+     (shpToken.Left = 1117) AND (shpToken.Top = 393) OR
+     (shpToken.Left = 795) AND (shpToken.Top = 393) OR
+     (shpToken.Left = 312) AND (shpToken.Top = 273)
+      then
+      begin
+       Inc(iCount2xPlayer1);
+       ShowMessage('Your next move will be doubled!');
+      end;
+
+
+     //Mystery Box
+    If(shpToken.Left = 473) AND (shpToken.Top = 513) OR
+      (shpToken.Left = 312) AND (shpToken.Top = 153) OR
+      (shpToken.Left = 312) AND (shpToken.Top = 33) OR
+      (shpToken.Left = 795) AND (shpToken.Top = 33)
+
+      then
+        begin
+         Dec(iTurn);
+         Dec(iCount);
+         lblImpossibleMys.Visible := True;
+
+         iNum := RandomRange(1,10);
+          case iNum of
+
+            1:   ShowMessage('Move 3 blocks forward');
+            2:   ShowMessage('Move back 3 blocks');
+            3:   ShowMessage('Move up 1 block');
+            4:   ShowMessage('Move down 1 block ');
+            5:   ShowMessage('Go to the nearest 2x Multiplier block');
+            6:   ShowMessage('Go to the nearest ladder');
+            7:   ShowMessage('Go to the nearest snake');
+            8:   ShowMessage('Move 1 block up and 2 blocks right');
+            9:   ShowMessage('Move 2 blocks left');
+            10:  ShowMessage('Move up 5 blocks');
+
+          end
+        end
+        else lblImpossibleMys.Visible := False;
+
+
+
+    //Snakes
+    //Snake 1:
+    If (shpToken.Left = 956) AND (shpToken.Top = 273)
+    then
+      Begin
+        ShowMessage('Oh no, you have been eaten by a snake!');
+        shpToken.Left := 795;
+        shpToken.Top := 513;
+      end;
+
+    //Snake 2:
+    If (shpToken.Left = 1117) AND (shpToken.Top = 153)
+     then
+      Begin
+        ShowMessage('Oh no, you have been eaten by a snake!');
+        shpToken.Left := 1117;
+        shpToken.Top := 393;
+       end;
+
+    //Snake 3:
+    If (shpToken.Left = 795) AND (shpToken.Top = 153)
+      then
+      Begin
+        ShowMessage('Oh no, you have been eaten by a snake!');
+        shpToken.Left := 795;
+        shpToken.Top := 393;
+      end;
+
+    //Snake 4:
+   If (shpToken.Left = 634) AND (shpToken.Top = 33)
+     then
+      Begin
+        ShowMessage('Oh no, you have been eaten by a snake!');
+        shpToken.Left := 312;
+        shpToken.Top := 513;
+      end;
+
+    //Ladders
+    //Ladder 1:
+    If (shpToken.Left = 634) AND (shpToken.Top = 513)
+    then
+    Begin
+    ShowMessage('Yay, you have found a ladder!');
+    shpToken.Left := 634;
+    shpToken.Top := 153;
+   end;
+
+    //Ladder 2:
+    If (shpToken.Left = 956) AND (shpToken.Top = 513)
+    then
+    Begin
+    ShowMessage('Yay, you have found a ladder!');
+    shpToken.Left := 956;
+    shpToken.Top := 393;
+    end;
+
+    //Ladder 3:
+    If (shpToken.Left = 473) AND (shpToken.Top = 393)
+    then
+    Begin
+    ShowMessage('Yay, you have found a ladder!');
+    shpToken.Left := 473;
+    shpToken.Top := 33;
+    end;
+
+    //Ladder 4:
+    If (shpToken.Left = 956) AND (shpToken.Top = 153)
+    then
+    Begin
+    ShowMessage('Yay, you have found a ladder!');
+    shpToken.Left := 956;
+    shpToken.Top := 33;
+    end;
+
+    //Moves Counter
+    Inc(iCount);
+    lblMovesCounter.Caption := 'Total moves this game: ' + IntToStr(iCount);
+
+    if (shpToken.Left = 1117) AND (shpToken.Top = 33)
+    then
+    begin
+      Sleep(2500);
+      iWin := 2;
+      frmEndScreen.Show;
+      frmSnakesAndLadders.Hide;
+    end;
+
+
+
+    end
+
+    //For Player 2
+    else if (iNumPlayers = 2) and (iTurn MOD 2 =  1)
+    then
+
+  begin
+
+    //2x Multiplier block
+     If (shpToken2.Left = 1117) AND (shpToken2.Top = 513) OR
+        (shpToken2.Left = 1117) AND (shpToken2.Top = 393) OR
+        (shpToken2.Left = 795) AND (shpToken2.Top = 393) OR
+        (shpToken2.Left = 312) AND (shpToken2.Top = 273)
+      then
+      begin
+      Inc(iCount2xPlayer2);
+      ShowMessage('Your next move will be doubled!');
+     end;
+
+     //Mystery Box
+    If(shpToken2.Left = 473) AND (shpToken2.Top = 513) OR
+      (shpToken2.Left = 312) AND (shpToken2.Top = 153) OR
+      (shpToken2.Left = 312) AND (shpToken2.Top = 33) OR
+      (shpToken2.Left = 795) AND (shpToken2.Top = 33)
+
+      then
+        begin
+         Dec(iTurn);
+         Dec(iCount);
+         lblImpossibleMys.Visible := True;
+
+         iNum := RandomRange(1,10);
+          case iNum of
+
+            1:   ShowMessage('Move 3 blocks forward');
+            2:   ShowMessage('Move back 3 blocks');
+            3:   ShowMessage('Move up 1 block');
+            4:   ShowMessage('Move down 1 block ');
+            5:   ShowMessage('Go to the nearest 2x Multiplier block');
+            6:   ShowMessage('Go to the nearest ladder');
+            7:   ShowMessage('Go to the nearest snake');
+            8:   ShowMessage('Move 1 block up and 2 blocks right');
+            9:   ShowMessage('Move 2 blocks left');
+            10:  ShowMessage('Move up 5 blocks');
+
+          end
+        end
+        else lblImpossibleMys.Visible := False;
+
+    //Snakes
+    //Snake 1:
+    If (shpToken2.Left = 956) AND (shpToken2.Top = 273)
+    then
+      Begin
+        ShowMessage('Oh no, you have been eaten by a snake!');
+        shpToken2.Left := 795;
+        shpToken2.Top := 513;
+      end;
+
+    //Snake 2:
+    If (shpToken2.Left = 1117) AND (shpToken2.Top = 153)
+    then
+      Begin
+        ShowMessage('Oh no, you have been eaten by a snake!');
+        shpToken2.Left := 1117;
+        shpToken2.Top := 393;
+       end;
+
+    //Snake 3:
+    If (shpToken2.Left = 795) AND (shpToken2.Top = 153)
+    then
+      Begin
+        ShowMessage('Oh no, you have been eaten by a snake!');
+        shpToken2.Left := 795;
+        shpToken2.Top := 393;
+      end;
+
+    //Snake 4:
+    If (shpToken2.Left = 634) AND (shpToken2.Top = 33)
+    then
+      Begin
+        ShowMessage('Oh no, you have been eaten by a snake!');
+        shpToken2.Left := 312;
+        shpToken2.Top := 513;
+      end;
+
+    //Ladders
+    //Ladder 1:
+    If (shpToken2.Left = 634) AND (shpToken2.Top = 513)
+    then
+    Begin
+      ShowMessage('Yay, you have found a ladder!');
+      shpToken2.Left := 634;
+      shpToken2.Top := 153;
+    end;
+
+    //Ladder 2:
+    If (shpToken2.Left = 956) AND (shpToken2.Top = 513)
+    then
+    Begin
+      ShowMessage('Yay, you have found a ladder!');
+      shpToken2.Left := 956;
+        shpToken2.Top := 393;
+    end;
+
+    //Ladder 3:
+    If (shpToken2.Left = 473) AND (shpToken2.Top = 393)
+    then
+    Begin
+     ShowMessage('Yay, you have found a ladder!');
+     shpToken2.Left := 473;
+     shpToken2.Top := 33;
+    end;
+
+    //Ladder 4:
+    If (shpToken2.Left = 956) AND (shpToken2.Top = 153)
+    then
+   Begin
+     ShowMessage('Yay, you have found a ladder!');
+     shpToken2.Left := 956;
+     shpToken2.Top := 33;
+    end;
+
+    //Moves Counter
+    Inc(iCount);
+    lblMovesCounter.Caption := 'Total moves this game: ' + IntToStr(iCount);
+
+    if (shpToken2.Left = 1117) AND (shpToken2.Top = 33)
+    then
+    begin
+      Sleep(2500);
+      iWin := 3;
+      frmEndScreen.Show;
+      frmSnakesAndLadders.Hide;
+    end;
+
+    end;
+
+      //Showing when it is the turn of each player
+
+  if iWin > 0           //Makes sure that no message is diplayed when the game is won
+  then iWin := iWin
+  else if iNumPlayers = 2
+    then
+      begin
+        Inc(iTurn);
+        If iTurn MOD 2 =  1
+            then
+            begin
+              ShowMessage(sName2 + 's turn');
+            end
+	            else
+                 begin
+                   ShowMessage(sName1 + 's turn');
+                 end;
+
+
+      end;
+  end;
+
+procedure TfrmSnakesAndLadders.btnDownClick(Sender: TObject);
+
+begin
+   //Down button
+   //Exits prevent tokens moving off the board
+  if (iNumPlayers = 2) AND (iTurn MOD 2 =  1)
+    then
+    begin
+      if shpToken2.Top > 512
+      then Exit;
+
+      iTop2 := shpToken2.Top;
+      shpToken2.Top := iTop2 + 120;
+    end
+    else if (iNumPlayers = 2) AND (iTurn MOD 2 =  0)
+      then
+      begin
+        if shpToken.Top > 512
+        then Exit;
+
+       iTop := shpToken.Top;
+       shpToken.Top := iTop + 120;
+      end
+      else if iNumPlayers = 1
+        then
+        begin
+          if shpToken.Top > 512
+           then Exit;
+
+          iTop := shpToken.Top;
+          shpToken.Top := iTop + 120;
+        end;
+
+
+
+
+end;
+
+procedure TfrmSnakesAndLadders.btnLeftClick(Sender: TObject);
+begin
+   //Left button
+   //Exits prevent tokens moving off the board
+   if (iNumPlayers = 2) AND (iTurn MOD 2 =  1)
+    then
+    begin
+      if shpToken2.Left < 313
+      then Exit;
+
+      iLeft2 := shpToken2.Left;
+      shpToken2.Left := iLeft2 - 161;
+    end
+    else if (iNumPlayers = 2) AND (iTurn MOD 2 =  0)
+      then
+      begin
+        if shpToken.Left < 313
+        then Exit;
+
+       iLeft := shpToken.Left;
+       shpToken.Left := iLeft - 161;
+      end
+      else if iNumPlayers = 1
+        then
+        begin
+          if shpToken.Left < 313
+           then Exit;
+
+          iLeft := shpToken.Left;
+          shpToken.Left := iLeft - 161;
+        end;
+
+
+end;
+
+procedure TfrmSnakesAndLadders.btnRightClick(Sender: TObject);
+begin
+   //Right button
+   //Exits prevent tokens moving off the board
+  if (iNumPlayers = 2) and (iTurn MOD 2 =  1)
+    then
+    begin
+      if shpToken2.Left > 1116
+      then Exit;
+
+      iLeft2 := shpToken2.Left;
+      shpToken2.Left := iLeft2 + 161;
+    end
+    else if (iNumPlayers = 2) and (iTurn MOD 2 =  0)
+      then
+      begin
+        if shpToken.Left > 1116
+        then Exit;
+
+       iLeft := shpToken.Left;
+       shpToken.Left := iLeft + 161;
+      end
+      else if iNumPlayers = 1
+        then
+        begin
+          if shpToken.Left > 1116
+          then Exit;
+
+          iLeft := shpToken.Left;
+          shpToken.Left := iLeft + 161;
+        end;
+end;
+
+procedure TfrmSnakesAndLadders.btnRollDiceClick(Sender: TObject);
+begin
+  iDice1 := RandomRange(1,7);
+  edtDice.Text := IntToStr(iDice1);
+  Case iDice1 of
+   1 : imgDice.Picture.LoadFromFile('Dice1.jpg');
+   2 : imgDice.Picture.LoadFromFile('Dice2.jpg');
+   3 : imgDice.Picture.LoadFromFile('Dice3.jpg');
+   4 : imgDice.Picture.LoadFromFile('Dice4.jpg');
+   5 : imgDice.Picture.LoadFromFile('Dice5.jpg');
+   6 : imgDice.Picture.LoadFromFile('Dice6.jpg');
+  end;
+
+  iDice2 := iDice1;
+  iDice3 := iDice1;
+
+  if (iCount2xPlayer1 > 0) AND (iTurn MOD 2 =  0)
+    then
+    begin
+      iDice2 := iDice2 * 2;
+      iCount2xPlayer1 := iCount2xPlayer1 - 1;
+      edtDice.Text := IntToStr(iDice2);
+      lbl2xDisclaimer.Visible := True;
+
+    end
+    else if (iCount2xPlayer2 > 0) AND (iTurn MOD 2 =  1)
+        then
+        begin
+        iDice3 := iDice3 * 2;
+        iCount2xPlayer2 := iCount2xPlayer2 - 1;
+        edtDice.Text := IntToStr(iDice3);
+        lbl2xDisclaimer.Visible := True;
+
+        end
+        else  lbl2xDisclaimer.Visible := False;
+
+  ShowMessage('Move amount indicated by the dice, then click on "Done"');
+
+end;
+
+
+procedure TfrmSnakesAndLadders.btnRulesClick(Sender: TObject);
+begin
+  pnlRules.Visible := True;
+end;
+
+procedure TfrmSnakesAndLadders.btnUpClick(Sender: TObject);
+begin
+   //Up button
+   //Exits prevent tokens moving off the board
+  if (iNumPlayers = 2) and (iTurn MOD 2 =  1)
+    then
+    begin
+      if shpToken2.Top < 34
+      then Exit;
+
+      iTop2 := shpToken2.Top;
+      shpToken2.Top := iTop2 - 120;
+    end
+    else if (iNumPlayers = 2) and (iTurn MOD 2 =  0)
+      then
+      begin
+        if shpToken.Top < 34
+        then Exit;
+
+       iTop := shpToken.Top;
+       shpToken.Top := iTop - 120;
+      end
+      else if iNumPlayers = 1
+        then
+        begin
+          if shpToken.Top < 34
+           then Exit;
+
+          iTop := shpToken.Top;
+          shpToken.Top := iTop - 120;
+        end;
+
+end;
+procedure TfrmSnakesAndLadders.FormActivate(Sender: TObject);
+  var
+  sShape, sColour, sShape2, sColour2 : string;
+begin
+  iNumPlayers := StrToInt(InputBox('Number of players','Select the number of players', '1,2'));
+
+  if iNumPlayers = 1
+    then
+    begin
+     ShowMessage('Single player! Try and beat your high score by completing the game in the least amount of moves possible, indicated by the moves counter in the top left');
+     shpToken.Visible := True;
+    end
+        Else if iNumPlayers = 2
+              then
+                begin
+                  ShowMessage('2 players! Try and beat your friend by completing the game before they do, by getting to the final block before the other player');
+                  shpToken.Visible := True;
+                  shpToken2.Visible := True;
+                end
+                  Else ShowMessage('Enter only a 1 or a 2!');
+
+
+   if iNumPlayers = 1
+    then
+     begin
+      sName1 := InputBox('Player 1', 'What is your name?','');
+      sShape := InputBox('Token','What shape would you like your token to be?', 'Square,Circle,Round square');
+
+       if (sShape = 'Square') OR (sShape = 'square')
+        then
+          shpToken.Shape := stSquare
+            else if (sShape = 'Round square') OR (sShape = 'round square')
+                then
+                shpToken.Shape := stRoundSquare
+
+            else if (sShape = 'Circle') OR (sShape = 'circle')
+                  then
+                    shpToken.Shape := stCircle
+                  else ShowMessage('You did not pick one of the shapes!' + #13 + 'Default shape: Circle');
+
+      sColour := InputBox('Token','What colour would you like your token to be?', 'Red,Green,Blue');
+
+      if (sColour = 'Red') OR (sColour = 'red')
+          then
+           shpToken.Brush.Color := clRed
+           else if (sColour = 'Green') OR (sColour = 'green')
+                then
+                    shpToken.Brush.Color := clGreen
+                  else if (sColour = 'Blue') OR (sColour = 'blue')
+                      then
+                     shpToken.Brush.Color := clAqua
+                     else ShowMessage('You did not pick one of the colours!' + #13 + 'Default colour: Red');
+     end
+     else if iNumPlayers = 2
+            then
+            begin
+            sName1 := InputBox('Player 1', 'What is your name?','');
+            sShape := InputBox(sName1,'What shape would you like your token to be?', 'Square, Circle,Round square');
+
+             if (sShape = 'Square') OR (sShape = 'square')
+                then
+                  shpToken.Shape := stSquare
+                    else if (sShape = 'Round square') OR (sShape = 'round square')
+                       then
+                         shpToken.Shape := stRoundSquare
+                    else if (sShape = 'Circle') OR (sShape = 'circle')
+                         then
+                          shpToken.Shape := stCircle
+                          else ShowMessage('You did not pick one of the shapes!' + #13 + 'Default shape: Circle');
+
+             sColour := InputBox(sName1,'What colour would you like your token to be?', 'Red,Green,Blue');
+
+              if (sColour = 'Red') OR (sColour = 'red')
+                then
+                 shpToken.Brush.Color := clRed
+                 else if (sColour = 'Green') OR (sColour = 'green')
+                       then
+                       shpToken.Brush.Color := clGreen
+                         else if (sColour = 'Blue') OR (sColour = 'blue')
+                               then
+                                shpToken.Brush.Color := clAqua
+                               else ShowMessage('You did not pick one of the colours!' + #13 + 'Default colour: Red');
+
+
+              sName2 := InputBox('Player 2', 'What is your name?','');
+              sShape2 := InputBox(sName2,'What shape would you like your token to be?', 'Square, Circle, Round square');
+
+              if (sShape2 = 'Square') OR (sShape2 = 'square')
+                then
+                  shpToken2.Shape := stSquare
+                    else if (sShape = 'Round square') OR (sShape = 'round square')
+                       then
+                         shpToken2.Shape := stRoundSquare
+                    else if (sShape2 = 'Circle') OR (sShape2 = 'circle')
+                          then
+                            shpToken2.Shape := stCircle
+                          else ShowMessage('You did not pick one of the shapes!' + #13 + 'Default shape: Circle');
+
+              sColour2 := InputBox(sName2,'What colour would you like your token to be?', 'Red,Green,Blue');
+
+              if (sColour2 = 'Red') OR (sColour2 = 'red')
+                  then
+                  shpToken2.Brush.Color := clRed
+                  else if (sColour2 = 'Green') OR (sColour2 = 'green')
+                        then
+                        shpToken2.Brush.Color := clGreen
+                        else if (sColour2 = 'Blue') OR (sColour2 = 'blue')
+                              then
+                              shpToken2.Brush.Color := clAqua
+                              else ShowMessage('You did not pick one of the colours!' + #13 + 'Default colour: Red');
+
+            end;
+
+
+     if iNumPlayers = 1           //Prompts the player to move the dice for the 1st time
+      then
+      begin
+        lblMovesCounter.Visible := True;
+        Sleep(250);
+        ShowMessage('Roll the dice');
+      end
+      else if iNumPlayers = 2
+            then
+            begin
+              lblMovesCounter.Visible := True;
+              ShowMessage(sName1 + 's Turn!');
+              Sleep(250);
+              ShowMessage('Roll the dice');
+            end;
+
+end;
+
+
+procedure TfrmSnakesAndLadders.lblImpossibleMysClick(Sender: TObject);
+begin
+  btnDoneClick(Self);  {Allows the mystery box to give another instruction
+                        if current one is impossible, Reference: Virtual Keys document}
+end;
+
+procedure TfrmSnakesAndLadders.tmrImpossibleMysTimer(Sender: TObject);
+begin
+  if lblImpossibleMys.Font.Color = clWhite            //Aloows for the flashing lable
+    then  lblImpossibleMys.Font.Color := clBlack
+      else if lblImpossibleMys.Font.Color = clBlack
+         then  lblImpossibleMys.Font.Color := clWhite;
+
+
+end;
+
+end.
